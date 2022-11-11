@@ -1,13 +1,14 @@
 package main
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"gistclone/app/database"
+	"gistclone/app/routes"
+	_ "gistclone/docs"
+	"log"
+)
 
 func main() {
-	app := fiber.New()
-
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World 👋!")
-	})
-
-	app.Listen(":3000")
+	database.ConnectDb()
+	app := routes.New()
+	log.Fatal(app.Listen(":3000"))
 }
