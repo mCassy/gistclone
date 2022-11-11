@@ -2,11 +2,11 @@ package handlers
 
 import (
 	"fmt"
-	"gistclone/app/database"
-	"gistclone/app/models"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	"gitlab.com/mCassy/gistclone/app/database"
+	"gitlab.com/mCassy/gistclone/app/models"
 )
 
 type ResponseHTTP struct {

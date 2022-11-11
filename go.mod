@@ -1,4 +1,4 @@
-module gistclone
+module gitlab.com/mCassy/gistclone
 
 go 1.19
 

@@ -1,10 +1,11 @@
 package main
 
 import (
-	"gistclone/app/database"
-	"gistclone/app/routes"
-	_ "gistclone/docs"
+	_ "gitlab.com/mCassy/gistclone/docs"
 	"log"
+
+	"gitlab.com/mCassy/gistclone/app/database"
+	"gitlab.com/mCassy/gistclone/app/routes"
 )
 
 func main() {

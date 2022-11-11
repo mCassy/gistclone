@@ -1,12 +1,11 @@
 package routes
 
 import (
-	"gistclone/app/handlers"
-
 	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"gitlab.com/mCassy/gistclone/app/handlers"
 )
 
 func New() *fiber.App {

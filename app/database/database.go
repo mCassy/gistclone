@@ -1,10 +1,10 @@
 package database
 
 import (
-	"gistclone/app/models"
 	"log"
 	"os"
 
+	"gitlab.com/mCassy/gistclone/app/models"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
