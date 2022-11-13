@@ -11,4 +11,7 @@ type Gist struct {
 	ForksCnt    int    `json:"forks_count" example:"21"`
 	UserID      int    `json:"user_id" example:"21"`
 	User        User
+	Files       []File
 }
+
+type GistList []*Gist

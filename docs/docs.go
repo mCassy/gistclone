@@ -16,7 +16,123 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/v1/gists/{id}": {
+        "/api/v1/gists": {
+            "get": {
+                "description": "Get list of public gists",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gists"
+                ],
+                "summary": "Get list of gists",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/handlers.ResponseHTTP"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.GistResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ResponseHTTP"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ResponseHTTP"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Register gist",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "gists"
+                ],
+                "summary": "Register a new gist",
+                "parameters": [
+                    {
+                        "description": "Register gist",
+                        "name": "gist",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GistRequestBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/handlers.ResponseHTTP"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.GistResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ResponseHTTP"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gists/{id}": {
             "get": {
                 "description": "Get gist by ID",
                 "consumes": [
@@ -52,7 +168,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/models.Gist"
+                                                "$ref": "#/definitions/dto.GistResponse"
                                             }
                                         }
                                     }
@@ -77,46 +193,57 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "gorm.DeletedAt": {
+        "dto.FileDTO": {
             "type": "object",
             "properties": {
-                "time": {
-                    "type": "string"
+                "content": {
+                    "type": "string",
+                    "example": "\u003c?php echo 1;?\u003e"
                 },
-                "valid": {
-                    "description": "Valid is true if Time is not NULL",
-                    "type": "boolean"
+                "name": {
+                    "type": "string",
+                    "example": "class"
                 }
             }
         },
-        "handlers.ResponseHTTP": {
+        "dto.GistRequestBody": {
             "type": "object",
             "properties": {
-                "data": {},
-                "message": {
-                    "type": "string"
-                },
-                "success": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "models.Gist": {
-            "type": "object",
-            "properties": {
-                "createdAt": {
-                    "type": "string"
-                },
-                "deletedAt": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
-                },
                 "description": {
                     "type": "string",
                     "example": "Gist short description"
                 },
-                "forks_count": {
-                    "type": "integer",
-                    "example": 21
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.FileDTO"
+                    }
+                },
+                "is_public": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "name": {
+                    "type": "string",
+                    "example": "class"
+                }
+            }
+        },
+        "dto.GistResponse": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Gist short description"
+                },
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.FileDTO"
+                    }
+                },
+                "forks": {
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"
@@ -129,40 +256,20 @@ const docTemplate = `{
                     "type": "string",
                     "example": "class"
                 },
-                "stars_count": {
-                    "type": "integer",
-                    "example": 21
-                },
-                "updatedAt": {
-                    "type": "string"
-                },
-                "user": {
-                    "$ref": "#/definitions/models.User"
-                },
-                "user_id": {
-                    "type": "integer",
-                    "example": 21
+                "stars": {
+                    "type": "integer"
                 }
             }
         },
-        "models.User": {
+        "handlers.ResponseHTTP": {
             "type": "object",
             "properties": {
-                "createdAt": {
+                "data": {},
+                "message": {
                     "type": "string"
                 },
-                "deletedAt": {
-                    "$ref": "#/definitions/gorm.DeletedAt"
-                },
-                "email": {
-                    "type": "string",
-                    "example": "lol@kek.com"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "updatedAt": {
-                    "type": "string"
+                "success": {
+                    "type": "boolean"
                 }
             }
         }

@@ -19,7 +19,6 @@ func New() *fiber.App {
 
 	app.Get("/docs/*", swagger.HandlerDefault)
 
-	
 	api := app.Group("/api")
 	v1 := api.Group("/v1", func(c *fiber.Ctx) error {
 		c.JSON(fiber.Map{
@@ -28,8 +27,9 @@ func New() *fiber.App {
 		return c.Next()
 	})
 
-
 	v1.Get("/gists/:id", handlers.GetGistByID)
+	v1.Post("/gists", handlers.CreateGist)
+	v1.Get("/gists", handlers.GetGistList)
 
 	return app
 }

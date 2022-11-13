@@ -1,31 +1,39 @@
 definitions:
-  gorm.DeletedAt:
+  dto.FileDTO:
     properties:
-      time:
+      content:
+        example: <?php echo 1;?>
         type: string
-      valid:
-        description: Valid is true if Time is not NULL
-        type: boolean
+      name:
+        example: class
+        type: string
     type: object
-  handlers.ResponseHTTP:
+  dto.GistRequestBody:
     properties:
-      data: {}
-      message:
-        type: string
-      success:
-        type: boolean
-    type: object
-  models.Gist:
-    properties:
-      createdAt:
-        type: string
-      deletedAt:
-        $ref: '#/definitions/gorm.DeletedAt'
       description:
         example: Gist short description
         type: string
-      forks_count:
-        example: 21
+      files:
+        items:
+          $ref: '#/definitions/dto.FileDTO'
+        type: array
+      is_public:
+        example: true
+        type: boolean
+      name:
+        example: class
+        type: string
+    type: object
+  dto.GistResponse:
+    properties:
+      description:
+        example: Gist short description
+        type: string
+      files:
+        items:
+          $ref: '#/definitions/dto.FileDTO'
+        type: array
+      forks:
         type: integer
       id:
         type: integer
@@ -35,35 +43,92 @@ definitions:
       name:
         example: class
         type: string
-      stars_count:
-        example: 21
-        type: integer
-      updatedAt:
-        type: string
-      user:
-        $ref: '#/definitions/models.User'
-      user_id:
-        example: 21
+      stars:
         type: integer
     type: object
-  models.User:
+  handlers.ResponseHTTP:
     properties:
-      createdAt:
+      data: {}
+      message:
         type: string
-      deletedAt:
-        $ref: '#/definitions/gorm.DeletedAt'
-      email:
-        example: lol@kek.com
-        type: string
-      id:
-        type: integer
-      updatedAt:
-        type: string
+      success:
+        type: boolean
     type: object
 info:
   contact: {}
 paths:
-  /v1/gists/{id}:
+  /api/v1/gists:
+    get:
+      consumes:
+      - application/json
+      description: Get list of public gists
+      parameters:
+      - description: Offset
+        in: query
+        name: offset
+        required: true
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/handlers.ResponseHTTP'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.GistResponse'
+                  type: array
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handlers.ResponseHTTP'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/handlers.ResponseHTTP'
+      summary: Get list of gists
+      tags:
+      - gists
+    post:
+      consumes:
+      - application/json
+      description: Register gist
+      parameters:
+      - description: Register gist
+        in: body
+        name: gist
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GistRequestBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/handlers.ResponseHTTP'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.GistResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handlers.ResponseHTTP'
+      summary: Register a new gist
+      tags:
+      - gists
+  /api/v1/gists/{id}:
     get:
       consumes:
       - application/json
@@ -85,7 +150,7 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/models.Gist'
+                    $ref: '#/definitions/dto.GistResponse'
                   type: array
               type: object
         "404":
